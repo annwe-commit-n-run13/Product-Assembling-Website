@@ -1,0 +1,73 @@
+<?php
+
+include('config/constants.php');
+
+// echo "delete product page";
+
+if(isset($_GET['id']) && isset($_GET['image_name']))
+{
+    // process to delete
+    // echo "process to delete";
+
+    // 1. get id and image name
+    $id = $_GET['id'];
+    $image_name = $_GET['image_name'];
+
+    // 2. remove the image if available
+    // remove the physical image file is available
+    if($image_name != "")
+    {
+        // image is available. So remove it
+        $path = "images/product/".$image_name; // get the image path
+        // remove the image
+        $remove = unlink($path);
+
+        // if removing was not successful then add an error and stop the process
+        if ($remove==false)
+        {
+            // removal of image was not successful
+            // set the session message
+            $_SESSION['upload'] = "<div class='success-message-delete'>Removing Image File was Unsuccessful</div>";
+            // redirect to category page
+            header('location:'.SITEURL.'product.php');
+            // stop the process
+            die();
+        }
+    }
+
+
+    // 3. delete product from database 
+    // sql query to delete data from database
+    $sql = "DELETE FROM table_products WHERE id=$id";
+
+    // to execue the query
+    $res = mysqli_query($conn, $sql);
+
+    // check whether the query executed successfully or not
+    if($res == TRUE)
+    {
+        // echo "Category Deleted Successfully";
+        $_SESSION['delete'] = "<div class = 'success-message-delete'>Product was Deleted Successfully</div>";
+        // redirect page to manage admin
+        header('location:'.SITEURL.'product.php');
+    }
+    else
+    {
+        // echo "Admin could not be deleted";
+        $_SESSION['delete'] = "Product Could Not Be Deleted. Please Try Again";
+        // redirect page to manage admin
+        header('location:'.SITEURL.'product.php');
+    }
+
+    // 4. redirect to manage product with message
+}
+else
+{
+    // redirect to manage product page
+    // echo "redirect";
+    $_SESSION['unauthorize'] = "<div class ='success-message-delete'>Unauthorized Access</div>";
+    // redirect page to manage product
+    header('location:'.SITEURL.'product.php');
+}
+
+?>
